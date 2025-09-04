@@ -1,0 +1,230 @@
+import React, { useState, useRef } from "react";
+import {
+  SafeAreaView,
+  View,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Text,
+  ImageBackground,
+  Dimensions,
+  Animated,
+  PanResponder,
+} from "react-native";
+import { McText, McAvatar, McIcon } from "@/constants/styled";
+import { COLORS, dummyData, images, SIZES } from "@/constants";
+import { icons } from "@/constants";
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const ITEM_WIDTH = 200;
+const ITEM_MARGIN = 10;
+const ITEM_TOTAL_WIDTH = ITEM_WIDTH + ITEM_MARGIN * 2;
+
+const EventScreen = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const featuredListRef = useRef(null);
+
+  const [events, setEvents] = useState([
+    { id: "1", name: "Music Festival", date: "Dec 28", location: "Central Park" },
+    { id: "2", name: "Tech Conference", date: "Jan 15", location: "Convention Center" },
+    { id: "3", name: "Art Exhibition", date: "Dec 30", location: "Modern Art Museum" },
+  ]);
+
+  const filteredEvents = events.filter(event =>
+    event.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // PanResponder for touch handling
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx < -50) {
+          // Swipe left - go to next
+          goToNextFeatured();
+        } else if (gestureState.dx > 50) {
+          // Swipe right - go to previous
+          goToPreviousFeatured();
+        }
+      },
+    })
+  ).current;
+
+  const goToNextFeatured = () => {
+    if (currentFeaturedIndex < dummyData.Events.length - 1) {
+      setCurrentFeaturedIndex(prev => prev + 1);
+      featuredListRef.current?.scrollToIndex({
+        index: currentFeaturedIndex + 1,
+        animated: true,
+      });
+    }
+  };
+
+  const goToPreviousFeatured = () => {
+    if (currentFeaturedIndex > 0) {
+      setCurrentFeaturedIndex(prev => prev - 1);
+      featuredListRef.current?.scrollToIndex({
+        index: currentFeaturedIndex - 1,
+        animated: true,
+      });
+    }
+  };
+
+  const _renderFeaturedItem = ({ item, index }: any) => {
+    const inputRange = [
+      (index - 1) * ITEM_TOTAL_WIDTH,
+      index * ITEM_TOTAL_WIDTH,
+      (index + 1) * ITEM_TOTAL_WIDTH,
+    ];
+
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.9, 1.0, 0.9],
+      extrapolate: 'clamp',
+    });
+
+    const opacity = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.7, 1.0, 0.7],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          opacity,
+          width: ITEM_WIDTH,
+          marginHorizontal: ITEM_MARGIN,
+        }}
+      >
+        <ImageBackground 
+          source={item.image}
+          className="rounded-2xl bg-cover"
+          style={{
+            width: '100%',
+            height: 200,
+            justifyContent: 'flex-end',
+            overflow: 'hidden',
+          }}
+        >
+          <View className="bg-black bg-opacity-40 p-3">
+            <McText h4 className="text-white">{item.title}</McText>
+            <McText body6 className="text-gray-300">{item.startingTime}</McText>
+          </View>
+        </ImageBackground>
+      </Animated.View>
+    );
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-black">
+      {/* Header Section */}
+      <View className="flex-row justify-between p-4">
+        <View>
+          <McText body5 className="text-gray-400">Dec 25 9:10am</McText>
+          <McText h1 className="text-white">Explore Events</McText>
+        </View>
+        <McAvatar source={images.avatar} />
+      </View>
+
+      {/* Search Bar Section */}
+      <View className="px-4 pb-4">
+        <View className="bg-gray-800 rounded-lg flex-row items-center px-3">
+          <McIcon source={icons.search} size={20} tintColor={COLORS.gray} />
+          <TextInput
+            className="flex-1 text-white py-3 px-2"
+            placeholder="Search events..."
+            placeholderTextColor={COLORS.gray}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")} className="p-2">
+              <McIcon source={icons.close} size={16} tintColor={COLORS.gray} />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity className="p-2">
+            <McIcon source={icons.filter} size={20} tintColor={COLORS.gray} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Featured section with Swipeable Carousel */}
+      <View className="mb-6">
+        <View className="flex-row justify-between items-center px-4 mb-2">
+          <McText h5 className="text-gray-400">FEATURED EVENTS</McText>
+          <View className="flex-row">
+            <Text className="text-gray-400 text-sm">
+              {currentFeaturedIndex + 1} / {dummyData.Events.length}
+            </Text>
+          </View>
+        </View>
+
+        <View {...panResponder.panHandlers}>
+          <Animated.FlatList
+            ref={featuredListRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+            keyExtractor={(item) => 'featured_' + item.id}
+            data={dummyData.Events}
+            renderItem={_renderFeaturedItem}
+            snapToInterval={ITEM_TOTAL_WIDTH}
+            decelerationRate="fast"
+            snapToAlignment="center"
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: true }
+            )}
+            scrollEventThrottle={16}
+            onMomentumScrollEnd={(event) => {
+              const newIndex = Math.round(
+                event.nativeEvent.contentOffset.x / ITEM_TOTAL_WIDTH
+              );
+              setCurrentFeaturedIndex(newIndex);
+            }}
+          />
+        </View>
+
+        {/* Navigation Dots */}
+        <View className="flex-row justify-center mt-4">
+          {dummyData.Events.map((_, index) => (
+            <View
+              key={index}
+              className={`w-2 h-2 rounded-full mx-1 ${
+                index === currentFeaturedIndex ? 'bg-white' : 'bg-gray-600'
+              }`}
+            />
+          ))}
+        </View>
+
+        {/* Navigation Arrows (Optional) */}
+        <View className="flex-row justify-between items-center px-8 mt-4">
+          <TouchableOpacity
+            onPress={goToPreviousFeatured}
+            disabled={currentFeaturedIndex === 0}
+            className={`p-2 ${currentFeaturedIndex === 0 ? 'opacity-30' : 'opacity-100'}`}
+          >
+            <McIcon source={icons.left_arrow} size={24} tintColor={COLORS.white} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            onPress={goToNextFeatured}
+            disabled={currentFeaturedIndex === dummyData.Events.length - 1}
+            className={`p-2 ${currentFeaturedIndex === dummyData.Events.length - 1 ? 'opacity-30' : 'opacity-100'}`}
+          >
+            <McIcon source={icons.right_arrow} size={24} tintColor={COLORS.white} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Rest of your component remains the same */}
+      {/* ... */}
+    </SafeAreaView>
+  );
+};
+
+export default EventScreen;
