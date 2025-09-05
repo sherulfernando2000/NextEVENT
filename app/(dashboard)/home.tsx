@@ -10,10 +10,14 @@ import {
   Dimensions,
   Animated,
   PanResponder,
+  Touchable,
 } from "react-native";
 import { McText, McAvatar, McIcon } from "@/constants/styled";
 import { COLORS, dummyData, images, SIZES } from "@/constants";
 import { icons } from "@/constants";
+import moment from "moment";
+import { useNavigation } from '@react-navigation/native';
+import { Link } from "expo-router";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = 200;
@@ -25,6 +29,7 @@ const EventScreen = () => {
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const featuredListRef = useRef(null);
+  const navigation = useNavigation();
 
   const [events, setEvents] = useState([
     { id: "1", name: "Music Festival", date: "Dec 28", location: "Central Park" },
@@ -100,9 +105,21 @@ const EventScreen = () => {
           marginHorizontal: ITEM_MARGIN,
         }}
       >
-        <ImageBackground 
+        {/* <TouchableOpacity 
+          onPress={() => {
+            navigation.navigate('event', { selectedEvent: item });
+          }}
+          activeOpacity={0.8}
+          style={{ flex: 1 }}
+        > */}
+        <Link
+          href={{
+            pathname: `/event/${item.id}`,
+            
+        }}>
+          <ImageBackground 
           source={item.image}
-          className="rounded-2xl bg-cover"
+          className="rounded-2xl bg-cover relative"
           style={{
             width: '100%',
             height: 200,
@@ -110,11 +127,34 @@ const EventScreen = () => {
             overflow: 'hidden',
           }}
         >
+          
+                  <View className="absolute w-12 h-14 top-2 left-4 bg-white rounded-lg p-1 items-center justify-center shadow-md">
+                    <Text className="text-xs font-medium text-gray-600 ">
+                     {/* {moment(item.startingTime.split(' ')[0]).format('MMM').toUpperCase()} */}
+                      {moment(item.startingTime, 'YYYY/MM/DD HH:mm A').format('MMM').toUpperCase()}
+                    </Text>
+
+                    <Text className="text-lg font-bold text-gray-600 ">
+                     {/* {moment(item.startingTime.split(' ')[0]).format('MMM').toUpperCase()} */}
+                      {moment(item.startingTime, 'YYYY/MM/DD HH:mm A').format('DD').toUpperCase()}
+                    </Text>
+
+
+                  </View>
+                 
+        
           <View className="bg-black bg-opacity-40 p-3">
             <McText h4 className="text-white">{item.title}</McText>
             <McText body6 className="text-gray-300">{item.startingTime}</McText>
           </View>
         </ImageBackground>
+
+        </Link>
+
+          
+        {/* </TouchableOpacity> */}
+
+        
       </Animated.View>
     );
   };
