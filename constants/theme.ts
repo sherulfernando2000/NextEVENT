@@ -18,7 +18,8 @@ export const COLORS = {
   lightGray: '#dedede',
   transparentWhite: 'rgba(255, 255, 255, 0.2)',
   transparentBlack: 'rgba(0, 0, 0, 0.4)',
-  linear: ['#439DFEE8', '#F687FFE8'],
+  purple: '#702963',
+  linear: ['#439DFEE8', '#8B5CF6'],
 };
 export const SIZES = {
   // global sizes
