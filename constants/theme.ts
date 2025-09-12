@@ -17,7 +17,7 @@ export const COLORS = {
   gray1: '#666666',
   lightGray: '#dedede',
   transparentWhite: 'rgba(255, 255, 255, 0.2)',
-  transparentBlack: 'rgba(0, 0, 0, 0.4)',
+  transparentBlack: '#161717',
   purple: '#702963',
   linear: ['#439DFEE8', '#8B5CF6'],
 };

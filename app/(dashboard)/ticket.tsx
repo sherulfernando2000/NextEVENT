@@ -20,13 +20,13 @@ const dummyTickets = {
       bookingId: "UP654321"
     },
     {
-      id: "2",
+      id: "3",
       event: "Tech Meetup",
       date: "2025-10-02",
       bookingId: "UP654321"
     },
     {
-      id: "2",
+      id: "4",
       event: "Tech Meetup",
       date: "2025-10-02",
       bookingId: "UP654321"

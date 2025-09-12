@@ -42,7 +42,7 @@ const Login = () => {
   return (
     <View className="flex-1 bg-gray-100 justify-center p-4">
       <Text className="text-2xl font-bold mb-6 text-blue-600 text-center">
-        Login to Task Manager
+        Login to NextEVENT
       </Text>
       <TextInput
         placeholder="Email"

@@ -29,6 +29,16 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
+          className=" p-4 rounded-2xl flex-row gap-2"
+          onPress={() => router.push("/(organizer)/home")}
+        >
+          <Ionicons name="save-outline" size={24} color="white" />
+          <Text className="text-white text-lg">Post</Text>
+         
+        </TouchableOpacity>
+        
+
+        <TouchableOpacity
           className="p-4 rounded-2xl hover:bg-white/10 flex-row gap-2"
           onPress={() => router.push("/(dashboard)/profile/about")}
         >

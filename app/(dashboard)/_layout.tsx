@@ -17,11 +17,22 @@ const DashboardLayout = () => {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.purple,
-        tabBarActiveBackgroundColor:COLORS.white,
-        tabBarInactiveTintColor: "#000000",
+        // tabBarActiveBackgroundColor: COLORS.white,
+        tabBarInactiveTintColor: COLORS.white,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#ccc"
+          backgroundColor: COLORS.transparentBlack,
+          position: "absolute", // so border radius can show
+          left: 0,
+          right: 0,
+          bottom: 0,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          height: 60,
+          paddingTop: 5,
+          borderTopWidth: 0, // remove default border
+          overflow: "hidden", // ensure children respect radius
+
         }
       }}
     >
