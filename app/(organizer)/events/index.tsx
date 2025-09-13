@@ -24,16 +24,20 @@ const index = () => {
   };
 
   const renderEvent = ({ item }: { item: Event }) => (
-    <View style={styles.card}>
-      <View>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>{item.date}</Text>
-        <Text style={styles.subtitle}>{item.location}</Text>
+    <TouchableOpacity onPress={() => router.push(`/(organizer)/events/${item.id}`)}>
+      <View style={styles.card}>
+        <View>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.subtitle}>{item.date}</Text>
+          <Text style={styles.subtitle}>{item.location}</Text>
+        </View>
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item.id)}>
+          <Ionicons name="trash-outline" size={20} color="white" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item.id)}>
-        <Ionicons name="trash-outline" size={20} color="white" />
-      </TouchableOpacity>
-    </View>
+
+    </TouchableOpacity>
+
   );
 
   return (

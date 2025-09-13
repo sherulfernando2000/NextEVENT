@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const [id] = () => {
+const TicketById = () => {
   return (
     <View>
-      <Text>[id]</Text>
+      <Text>ticket</Text>
     </View>
   )
 }
 
-export default [id]
+export default TicketById
