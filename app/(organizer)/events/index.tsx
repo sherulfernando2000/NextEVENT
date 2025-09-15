@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
 import { deleteEvent, getEventsByUser } from "@/services/eventService";
 import { useAuth } from "@/context/AuthContext";
 import { Event } from "@/types/types";
 import moment from "moment";
-import { Alert,ActivityIndicator  } from "react-native";
+import { Alert, ActivityIndicator } from "react-native";
 
 // interface Event {
 //   id: string;
@@ -19,6 +19,7 @@ import { Alert,ActivityIndicator  } from "react-native";
 const EventIndex = () => {
   const router = useRouter();
   const { user } = useAuth()
+  const navigation = useNavigation()
   // const [events, setEvents] = useState<Event[]>([
   //   { id: "1", title: "Music Fest", date: "2025-09-20", location: "Colombo" },
   //   { id: "2", title: "Tech Meetup", date: "2025-10-01", location: "Kandy" },
@@ -28,8 +29,8 @@ const EventIndex = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchEventsByUser = async () => {
-    console.log(user.uid)
-    const events = await getEventsByUser(user ? user.uid : "")
+    // console.log(user.uid)
+    const events = await getEventsByUser(user ? user?.uid : "")
     console.log('events:', events)
     setEvents(events)
   }
@@ -57,7 +58,7 @@ const EventIndex = () => {
               Alert.alert("Success", "Event deleted successfully ✅");
             } catch (error) {
               Alert.alert("Error", "Failed to delete event ❌");
-            }finally{
+            } finally {
               setDeleteLoading(false)
             }
           },
@@ -87,7 +88,13 @@ const EventIndex = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.header}>My Events</Text>
+      <View className="flex-row items-center justify-between px-2 pb-4">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text className="text-white text-2xl font-bold">My Events</Text>
+        <Ionicons name="analytics-outline" size={24} color="white" />
+      </View>
 
       {/* Events List */}
       <FlatList
@@ -106,11 +113,11 @@ const EventIndex = () => {
       </TouchableOpacity>
 
       {deleteLoading && (
-      <View style={styles.loaderOverlay}>
-        <ActivityIndicator size="large" color="white" />
-        <Text style={{ color: "white", marginTop: 10 }}>Deleting...</Text>
-      </View>
-    )}
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size="large" color="white" />
+          <Text style={{ color: "white", marginTop: 10 }}>Deleting...</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -121,16 +128,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    padding: 16,
+    padding: 5,
   },
   header: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "white",
     marginBottom: 16,
   },
   card: {
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "#111827",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -139,18 +146,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "white",
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#B0B0B0",
   },
   deleteBtn: {
     backgroundColor: "#a13539",
     padding: 10,
     borderRadius: 8,
+    opacity: 0.8
   },
   addButton: {
     position: "absolute",
@@ -165,16 +173,16 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   loaderOverlay: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.6)",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 10,
-},
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
 });
 
 

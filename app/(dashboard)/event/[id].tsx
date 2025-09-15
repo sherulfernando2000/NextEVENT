@@ -16,8 +16,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { COLORS, dummyData } from '@/constants';
 import { getEventById } from '@/services/eventService';
 import { Event } from '@/types/types';
-
-
+import { addTicketPurchase } from '@/services/ticketService';
 
 const EventDetail: React.FC = () => {
   const router = useRouter();
@@ -25,21 +24,56 @@ const EventDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState('ABOUT');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [ticketQuantity, setTicketQuantity] = useState(1);
 
-  const buyTicket = () => {
-     Alert.alert("Success", "Ticket is requested successfully");
+
+  const buyTicket = async () => {
+    try {
+      setSaveLoading(true)
+      const resp = await addTicketPurchase({
+        eventId: selectedEvent ? selectedEvent.id : "",
+        quantity: ticketQuantity
+      })
+
+      console.log(resp)
+      Alert.alert(
+        "Success",
+        `Booked ${ticketQuantity} ticket${ticketQuantity > 1 ? 's' : ''} successfully!`,
+        [
+          {
+            text: "OK",
+            style: "default"
+          }
+        ]
+      );
+      setTicketQuantity(1)
+    } catch (error) {
+        console.log(error)
+    }finally{
+      setSaveLoading(false)
+    }
+
   }
+
+  const increaseQuantity = () => {
+    const maxTickets = selectedEvent?.ticketQuantity || 10;
+    if (ticketQuantity < maxTickets) {
+      setTicketQuantity(prev => prev + 1);
+    }
+  };
+
+  const decreaseQuantity = () => {
+    if (ticketQuantity > 1) {
+      setTicketQuantity(prev => prev - 1);
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
       if (id) {
         try {
           setLoading(true);
-
-          // Find the event that matches the id
-          // const foundEvent = dummyData.Events.find((event) => {
-          //   return event.id === parseInt(id as string);
-          // });
 
           const foundEvent = await getEventById(id);
 
@@ -71,7 +105,7 @@ const EventDetail: React.FC = () => {
   // Handle case where selectedEvent is not found
   if (!selectedEvent) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#1F2937', justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 18 }}>Event not found</Text>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -88,6 +122,8 @@ const EventDetail: React.FC = () => {
       </SafeAreaView>
     );
   }
+
+  const totalPrice = (selectedEvent.ticketprice || 0) * ticketQuantity;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
@@ -185,19 +221,18 @@ const EventDetail: React.FC = () => {
             {/* Starting Time */}
             <Text style={{
               color: '#E5E7EB',
-              fontSize: 16,
+              fontSize: 15,
               marginBottom: 16,
             }}>
-              DATE: {moment(selectedEvent.startingTime).format('MMMM Do YYYY')}
-
+              Date: {moment(selectedEvent.startingTime).format('MMMM Do YYYY')}
             </Text>
 
             <Text style={{
               color: '#E5E7EB',
-              fontSize: 16,
+              fontSize: 15,
               marginBottom: 16,
             }}>
-              TIME: {moment(selectedEvent.startingTime).format('h:mm a')}
+              Time: {moment(selectedEvent.startingTime).format('h:mm a')}
             </Text>
 
             {/* Date Badge */}
@@ -231,7 +266,7 @@ const EventDetail: React.FC = () => {
 
         {/* Content Section */}
         <View style={{
-          backgroundColor: '#1F2937',
+          backgroundColor: '#111827',
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           marginTop: -24,
@@ -259,7 +294,7 @@ const EventDetail: React.FC = () => {
                 <Text style={{
                   color: activeTab === tab ? '#1F2937' : '#9CA3AF',
                   fontWeight: activeTab === tab ? 'bold' : '500',
-                  fontSize: 14,
+                  fontSize: 13,
                 }}>
                   {tab}
                 </Text>
@@ -273,7 +308,7 @@ const EventDetail: React.FC = () => {
               <View>
                 <Text style={{
                   color: '#E5E7EB',
-                  fontSize: 16,
+                  fontSize: 14,
                   lineHeight: 24,
                   marginBottom: 24,
                 }}>
@@ -285,7 +320,7 @@ const EventDetail: React.FC = () => {
                 <View style={{ marginBottom: 24 }}>
                   <Text style={{
                     color: '#9CA3AF',
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: 'bold',
                     marginBottom: 4,
                   }}>
@@ -293,14 +328,11 @@ const EventDetail: React.FC = () => {
                   </Text>
 
                   <View style={{
-
                     borderRadius: 12,
-
-
                   }}>
                     <Text style={{
                       color: 'white',
-                      fontSize: 20,
+                      fontSize: 16,
                     }}>
                       {selectedEvent.location || 'Location Map'}
                     </Text>
@@ -317,7 +349,7 @@ const EventDetail: React.FC = () => {
                   <View>
                     <Text style={{
                       color: '#9CA3AF',
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: 'bold',
                       marginBottom: 4,
                     }}>
@@ -325,7 +357,7 @@ const EventDetail: React.FC = () => {
                     </Text>
                     <Text style={{
                       color: 'white',
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: 'bold',
                     }}>
                       RS. {selectedEvent.ticketprice || '17.60'}/person
@@ -342,23 +374,21 @@ const EventDetail: React.FC = () => {
                   <View>
                     <Text style={{
                       color: '#9CA3AF',
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: 'bold',
-                      marginBottom: 4,
+                      marginBottom: 1,
                     }}>
-                      Available tickets
+                      AVAILABLE TICKETS
                     </Text>
                     <Text style={{
                       color: 'white',
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: 'bold',
                     }}>
                       {selectedEvent.ticketQuantity || 'Free'}
                     </Text>
                   </View>
                 </View>
-
-
               </View>
             ) : (
               <View>
@@ -368,7 +398,6 @@ const EventDetail: React.FC = () => {
                   textAlign: 'center',
                   marginTop: 40,
                 }}>
-
                   {selectedEvent.description}
                 </Text>
 
@@ -381,21 +410,107 @@ const EventDetail: React.FC = () => {
                   {selectedEvent.title}
                   {selectedEvent.description}
                 </Text>
-
               </View>
-
             )}
+          </View>
+        </View>
+
+        {/* Quantity Selector */}
+        <View style={{
+          backgroundColor: '#111827',
+          paddingHorizontal: 20,
+          paddingVertical: 3,
+        }}>
+          <Text style={{
+            color: '#9CA3AF',
+            fontSize: 14,
+            fontWeight: 'bold',
+            marginBottom: 12,
+          }}>
+            SELECT QUANTITY
+          </Text>
+
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: '#374151',
+            borderRadius: 12,
+            padding: 16,
+            marginBottom: 16,
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+              <TouchableOpacity
+                onPress={decreaseQuantity}
+                style={{
+                  backgroundColor: ticketQuantity <= 1 ? '#4B5563' : COLORS.purple,
+                  borderRadius: 8,
+                  width: 36,
+                  height: 36,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                disabled={ticketQuantity <= 1}
+              >
+                <Ionicons name="remove" size={20} color="white" />
+              </TouchableOpacity>
+
+              <Text style={{
+                color: 'white',
+                fontSize: 18,
+                fontWeight: 'bold',
+                marginHorizontal: 20,
+                minWidth: 30,
+                textAlign: 'center',
+              }}>
+                {ticketQuantity}
+              </Text>
+
+              <TouchableOpacity
+                onPress={increaseQuantity}
+                style={{
+                  backgroundColor: ticketQuantity >= (selectedEvent?.ticketQuantity || 10) ? '#4B5563' : COLORS.purple,
+                  borderRadius: 8,
+                  width: 36,
+                  height: 36,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                disabled={ticketQuantity >= (selectedEvent?.ticketQuantity || 10)}
+              >
+                <Ionicons name="add" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ alignItems: 'flex-end' }}>
+              <Text style={{
+                color: '#9CA3AF',
+                fontSize: 12,
+              }}>
+                Total Price
+              </Text>
+              <Text style={{
+                color: 'white',
+                fontSize: 20,
+                fontWeight: 'bold',
+              }}>
+                RS. {totalPrice.toFixed(2)}
+              </Text>
+            </View>
           </View>
         </View>
 
         {/* Bottom Buy Ticket Button */}
         <View style={{
-          backgroundColor: '#1F2937',
+          backgroundColor: '#111827',
           paddingHorizontal: 20,
-          paddingVertical: 20,
           paddingBottom: 40,
         }}>
           <TouchableOpacity
+            onPress={buyTicket}
             style={{
               backgroundColor: COLORS.purple,
               borderRadius: 25,
@@ -411,14 +526,17 @@ const EventDetail: React.FC = () => {
               fontWeight: 'bold',
               marginRight: 8,
             }}>
-              BUY  TICKETS
+              {saveLoading ? (
+                "Processing..."
+              ) : (
+                `BUY ${ticketQuantity} TICKET${ticketQuantity > 1 ? 'S' : ''}`
+              )}
             </Text>
-            <Ionicons name="ticket-outline" size={20} color="white" />
+            {!saveLoading && <Ionicons name="ticket-outline" size={20} color="white" />}
+            {saveLoading && <Ionicons name="hourglass-outline" size={20} color="white" />}
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-
     </SafeAreaView>
   );
 };

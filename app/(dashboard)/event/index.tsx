@@ -41,7 +41,7 @@ const Events: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Categories for filtering
-  const categories = ['All', 'Comedy', 'Drama', 'Cinema', 'Standup Comedy', 'Music', 'Sports'];
+  const categories = ['All','Tech', 'Comedy', 'Drama', 'Cinema', 'Standup Comedy', 'Music', 'Sports'];
   const router = useRouter();
   // useEffect(() => {
   //   setEvents(dummyData.Events);

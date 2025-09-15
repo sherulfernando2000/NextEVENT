@@ -313,6 +313,7 @@ const AddEventScreen = () => {
           >
             <Picker.Item label="Select type..." value="" />
             <Picker.Item label="Comedy" value="Comedy" />
+            <Picker.Item label="Tech" value="Tech" />
             <Picker.Item label="Drama" value="Drama" />
             <Picker.Item label="Cinema" value="Cinema" />
             <Picker.Item label="Standup Comedy" value="Standup Comedy" />

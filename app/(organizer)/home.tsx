@@ -37,6 +37,7 @@ const OrganizerHome = () => {
       setEvents([]);
     } finally {
       setLoading(false);
+      //fdsa
     }
   };
 
@@ -149,19 +150,19 @@ const OrganizerHome = () => {
           <Text className="text-white text-lg font-semibold mb-4">Your Performance</Text>
           <View className="flex-row flex-wrap justify-between">
             <View className="bg-gray-900 rounded-xl p-4 w-[48%] mb-4">
-              <Text className="text-[#702963] text-2xl font-bold">{stats.totalEvents}</Text>
+              <Text className="text-white text-2xl font-bold">{stats.totalEvents}</Text>
               <Text className="text-gray-400 text-sm">Total Events</Text>
             </View>
             <View className="bg-gray-900 rounded-xl p-4 w-[48%] mb-4">
-              <Text className="text-[#702963] text-2xl font-bold">{stats.activeEvents}</Text>
+              <Text className="text-white text-2xl font-bold">{stats.activeEvents}</Text>
               <Text className="text-gray-400 text-sm">Active Events</Text>
             </View>
             <View className="bg-gray-900 rounded-xl p-4 w-[48%]">
-              <Text className="text-[#702963] text-2xl font-bold">{stats.totalTicketsSold}</Text>
+              <Text className="text-white text-2xl font-bold">{stats.totalTicketsSold}</Text>
               <Text className="text-gray-400 text-sm">Tickets Sold</Text>
             </View>
             <View className="bg-gray-900 rounded-xl p-4 w-[48%]">
-              <Text className="text-[#702963] text-2xl font-bold">LKR {stats.totalRevenue.toLocaleString()}</Text>
+              <Text className="text-white text-2xl font-bold">LKR {stats.totalRevenue.toLocaleString()}</Text>
               <Text className="text-gray-400 text-sm">Total Revenue</Text>
             </View>
           </View>
@@ -232,7 +233,7 @@ const OrganizerHome = () => {
         <View className="px-4 mb-6">
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-white text-lg font-semibold">Your Events</Text>
-            <TouchableOpacity onPress={() => router.push('/organizer/events')}>
+            <TouchableOpacity onPress={() => router.push('/(organizer)/events')}>
               <Text className="text-[#702963] font-medium">View All</Text>
             </TouchableOpacity>
           </View>
@@ -269,10 +270,10 @@ const OrganizerHome = () => {
                       <Text className="text-white font-semibold text-base flex-1" numberOfLines={1}>
                         {event.title}
                       </Text>
-                      <View className={`px-2 py-1 rounded-full ml-2 ${
+                      <View className={`px-3 py-1 rounded-full ml-2 min-w-[70px] ${
                         new Date(event.date) >= new Date() ? 'bg-green-600/20' : 'bg-gray-600/20'
                       }`}>
-                        <Text className={`text-xs font-medium ${
+                        <Text className={`text-xs font-medium  ${
                           new Date(event.date) >= new Date() ? 'text-green-400' : 'text-gray-400'
                         }`}>
                           {new Date(event.date) >= new Date() ? 'Upcoming' : 'Completed'}
@@ -340,7 +341,7 @@ const OrganizerHome = () => {
             <Text className="text-gray-400 text-sm mb-4">
               Our support team is here to help you succeed. Get assistance with event setup, promotion strategies, or technical issues.
             </Text>
-            <View className="flex-row space-x-3">
+            <View className="flex-row gap-3">
               <TouchableOpacity className="bg-[#702963] rounded-lg py-2 px-4 flex-1">
                 <Text className="text-white text-center font-semibold">Contact Support</Text>
               </TouchableOpacity>

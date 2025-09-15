@@ -80,7 +80,7 @@ const PurchasesByEventScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text className="text-white text-lg font-bold">Ticket Purchases</Text>
+        <Text className="text-white text-2xl font-bold bg-gray-900">Ticket Purchases</Text>
         <Ionicons name="analytics-outline" size={24} color="white" />
       </View>
 
