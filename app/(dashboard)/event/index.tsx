@@ -15,18 +15,23 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { COLORS, dummyData } from '@/constants';
+import { getEvents } from '@/services/eventService';
+import { Event } from '@/types/types';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 48) / 2; // 2 columns with 16px margins
 
-interface Event {
-  id: number;
-  type: string;
-  title: string;
-  startingTime: string;
-  image: any;
-  description: string;
-}
+// interface Event {
+//   id: number;
+//   type: string;
+//   title: string;
+//   date?:string;
+//   startingTime: string;
+//   image: any;
+//   description: string;
+//   ticketCount?: number
+// }
 
 const Events: React.FC = () => {
   const navigation = useNavigation();
@@ -37,11 +42,23 @@ const Events: React.FC = () => {
 
   // Categories for filtering
   const categories = ['All', 'Comedy', 'Drama', 'Cinema', 'Standup Comedy', 'Music', 'Sports'];
+  const router = useRouter();
+  // useEffect(() => {
+  //   setEvents(dummyData.Events);
+  //   setFilteredEvents(dummyData.Events);
+  // }, []);
 
-  useEffect(() => {
-    setEvents(dummyData.Events);
-    setFilteredEvents(dummyData.Events);
-  }, []);
+  const fetchEvents = async () => {
+    const events = await getEvents();
+    console.log(events)
+    setEvents(events)
+  }
+
+  useEffect(()=> {
+    fetchEvents()
+  })
+
+
 
   // Filter events based on search and category
   useEffect(() => {
@@ -70,9 +87,9 @@ const Events: React.FC = () => {
     setSelectedCategory(category);
   };
 
-  const handleEventPress = (event: Event) => {
-    // Navigate to event detail page
-    // navigation.navigate('EventDetailPage', { selectedEvent: event });
+  const handleEventPress = (id: string) => {
+    console.log('id.............', id)
+     router.push(`/event/${id}`);
   };
 
   const renderCategoryItem = ({ item }: { item: string }) => (
@@ -102,7 +119,7 @@ const Events: React.FC = () => {
 
   const renderEventCard = ({ item, index }: { item: Event; index: number }) => (
     <TouchableOpacity
-      onPress={() => handleEventPress(item)}
+      onPress={() => handleEventPress(item.id)}
       style={{
         width: cardWidth,
         marginBottom: 16,
@@ -113,7 +130,7 @@ const Events: React.FC = () => {
       }}
     >
       <ImageBackground
-        source={item.image}
+        source={{ uri: item.imageUrl }}
         style={{
           width: '100%',
           height: 160,
@@ -142,7 +159,7 @@ const Events: React.FC = () => {
               textTransform: 'uppercase',
             }}
           >
-            {moment(item.startingTime, 'YYYY/MM/DD HH:mm A').format('MMM').toUpperCase()}
+            {moment(item.date, 'YYYY/MM/DD HH:mm A').format('MMM').toUpperCase()}
           </Text>
           <Text
             style={{
@@ -205,7 +222,7 @@ const Events: React.FC = () => {
               marginLeft: 6,
             }}
           >
-            {item.startingTime}
+           {moment(item.startingTime).format("YYYY-MM-DD HH:mm")}
           </Text>
         </View>
 
@@ -247,9 +264,10 @@ const Events: React.FC = () => {
             color: 'white',
             fontSize: 20,
             fontWeight: 'bold',
+           
           }}
         >
-          Events
+          EVENTS
         </Text>
 
         <TouchableOpacity>
@@ -266,7 +284,7 @@ const Events: React.FC = () => {
             backgroundColor: '#374151',
             borderRadius: 12,
             paddingHorizontal: 16,
-            paddingVertical: 12,
+            paddingVertical: 1,
           }}
         >
           <Ionicons name="search-outline" size={20} color="#9CA3AF" />
@@ -275,12 +293,7 @@ const Events: React.FC = () => {
             placeholderTextColor="#9CA3AF"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            style={{
-              flex: 1,
-              marginLeft: 12,
-              color: 'white',
-              fontSize: 16,
-            }}
+            className="flex-1 text-white py-3 px-2"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>

@@ -6,7 +6,7 @@ export const Events = [
     type: 'CONCERT',
     title: 'The Weekend',
     startingTime: '2020/12/21 09:10 PM',
-    image: require('../assets/images/event_1.png'),
+    image: require('../assets/images/NextEventLogo.png'),
     description:
       'Non exercitation ullamco reprehenderit incididunt. Officia incididunt id exercitation velit aliqua ut deserunt do non. Aliquip sunt dolor enim occaecat ullamco id consectetur .',
   },

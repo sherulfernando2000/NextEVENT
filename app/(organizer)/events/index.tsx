@@ -3,24 +3,68 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
+import { deleteEvent, getEventsByUser } from "@/services/eventService";
+import { useAuth } from "@/context/AuthContext";
+import { Event } from "@/types/types";
+import moment from "moment";
+import { Alert,ActivityIndicator  } from "react-native";
 
-interface Event {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-}
+// interface Event {
+//   id: string;
+//   title: string;
+//   date: string;
+//   location: string;
+// }
 
-const index = () => {
+const EventIndex = () => {
   const router = useRouter();
-  const [events, setEvents] = useState<Event[]>([
-    { id: "1", title: "Music Fest", date: "2025-09-20", location: "Colombo" },
-    { id: "2", title: "Tech Meetup", date: "2025-10-01", location: "Kandy" },
-  ]);
+  const { user } = useAuth()
+  // const [events, setEvents] = useState<Event[]>([
+  //   { id: "1", title: "Music Fest", date: "2025-09-20", location: "Colombo" },
+  //   { id: "2", title: "Tech Meetup", date: "2025-10-01", location: "Kandy" },
+  // ]);
+
+  const [events, setEvents] = useState<Event[]>()
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const fetchEventsByUser = async () => {
+    console.log(user.uid)
+    const events = await getEventsByUser(user ? user.uid : "")
+    console.log('events:', events)
+    setEvents(events)
+  }
+
+
+  useEffect(() => {
+    fetchEventsByUser()
+  }, [])
 
   // Delete handler
   const handleDelete = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+    Alert.alert(
+      "Delete Event",
+      "Are you sure you want to delete this event?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setDeleteLoading(true)
+              await deleteEvent(id);
+              fetchEventsByUser();
+              Alert.alert("Success", "Event deleted successfully ✅");
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete event ❌");
+            }finally{
+              setDeleteLoading(false)
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const renderEvent = ({ item }: { item: Event }) => (
@@ -28,7 +72,7 @@ const index = () => {
       <View style={styles.card}>
         <View>
           <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.date}</Text>
+          <Text style={styles.subtitle}>{moment(item.startingTime).format('MMMM Do YYYY')}</Text>
           <Text style={styles.subtitle}>{item.location}</Text>
         </View>
         <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item.id)}>
@@ -60,11 +104,18 @@ const index = () => {
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>
+
+      {deleteLoading && (
+      <View style={styles.loaderOverlay}>
+        <ActivityIndicator size="large" color="white" />
+        <Text style={{ color: "white", marginTop: 10 }}>Deleting...</Text>
+      </View>
+    )}
     </View>
   );
 };
 
-export default index;
+export default EventIndex;
 
 const styles = StyleSheet.create({
   container: {
@@ -113,4 +164,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
+  loaderOverlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.6)",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 10,
+},
 });
+
+

@@ -88,13 +88,13 @@ const TicketsScreen = () => {
 
       {/* Tabs */}
       <View className="flex-row justify-around mb-4">
-        <TouchableOpacity onPress={() => setActiveTab("upcoming")}>
-          <Text className={`text-lg ${activeTab === "upcoming" ? "text-white font-bold" : "text-gray-400"}`}>
+        <TouchableOpacity onPress={() => setActiveTab("upcoming")} className="w-1/3 " >
+          <Text className={`text-lg ${activeTab === "upcoming" ? ` bg-[${COLORS.purple}] px-2 py-3 pl-10 rounded-3xl text-white` : "text-gray-400 px-3 py-3 rounded-3xl"}`}>
             Recent
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActiveTab("past")}>
-          <Text className={`text-lg ${activeTab === "past" ? "text-white font-bold" : "text-gray-400"}`}>
+        <TouchableOpacity onPress={() => setActiveTab("past")}  className="w-1/3">
+          <Text className={`text-lg ${activeTab === "past" ? ` bg-[${COLORS.purple}] px-2 py-3 pl-10 rounded-3xl text-white` : "text-gray-400 px-3 py-3 rounded-3xl "}`}>
             Past
           </Text>
         </TouchableOpacity>

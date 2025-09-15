@@ -7,24 +7,17 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { dummyData } from '@/constants';
+import { COLORS, dummyData } from '@/constants';
+import { getEventById } from '@/services/eventService';
+import { Event } from '@/types/types';
 
-// Define the Event interface
-interface Event {
-  id: number;
-  title: string;
-  image: any;
-  startingTime: string;
-  description?: string;
-  location?: string;
-  price?: number;
-  type?: string;
-}
+
 
 const EventDetail: React.FC = () => {
   const router = useRouter();
@@ -33,21 +26,27 @@ const EventDetail: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const buyTicket = () => {
+     Alert.alert("Success", "Ticket is requested successfully");
+  }
+
   useEffect(() => {
     const load = async () => {
       if (id) {
         try {
           setLoading(true);
-          
+
           // Find the event that matches the id
-          const foundEvent = dummyData.Events.find((event) => {
-            return event.id === parseInt(id as string);
-          });
-          
+          // const foundEvent = dummyData.Events.find((event) => {
+          //   return event.id === parseInt(id as string);
+          // });
+
+          const foundEvent = await getEventById(id);
+
           if (foundEvent) {
             setSelectedEvent(foundEvent);
           }
-          
+
         } catch (error) {
           console.error('Error loading event:', error);
         } finally {
@@ -93,11 +92,11 @@ const EventDetail: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       <StatusBar barStyle="light-content" />
-      
-      <ScrollView style={{ flex: 1 }}>
+
+      <ScrollView style={{ flex: 1, marginBottom: 25 }}>
         {/* Header Image with Overlay */}
         <ImageBackground
-          source={selectedEvent.image}
+          source={{ uri: selectedEvent.imageUrl }}
           style={{
             width: '100%',
             height: 400,
@@ -113,7 +112,7 @@ const EventDetail: React.FC = () => {
             paddingTop: 20,
           }}>
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => router.push('/event')}
               style={{
                 backgroundColor: 'rgba(0,0,0,0.5)',
                 borderRadius: 25,
@@ -125,7 +124,7 @@ const EventDetail: React.FC = () => {
             >
               <Ionicons name="arrow-back" size={24} color="white" />
             </TouchableOpacity>
-            
+
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <TouchableOpacity
                 style={{
@@ -139,7 +138,7 @@ const EventDetail: React.FC = () => {
               >
                 <Ionicons name="heart-outline" size={24} color="white" />
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={{
                   backgroundColor: 'rgba(0,0,0,0.5)',
@@ -172,7 +171,7 @@ const EventDetail: React.FC = () => {
             }}>
               {selectedEvent.type || 'SHOW'}
             </Text>
-            
+
             {/* Event Title */}
             <Text style={{
               color: 'white',
@@ -182,16 +181,25 @@ const EventDetail: React.FC = () => {
             }}>
               {selectedEvent.title}
             </Text>
-            
+
             {/* Starting Time */}
             <Text style={{
               color: '#E5E7EB',
               fontSize: 16,
               marginBottom: 16,
             }}>
-              STARTING {selectedEvent.startingTime}
+              DATE: {moment(selectedEvent.startingTime).format('MMMM Do YYYY')}
+
             </Text>
-            
+
+            <Text style={{
+              color: '#E5E7EB',
+              fontSize: 16,
+              marginBottom: 16,
+            }}>
+              TIME: {moment(selectedEvent.startingTime).format('h:mm a')}
+            </Text>
+
             {/* Date Badge */}
             <View style={{
               position: 'absolute',
@@ -208,14 +216,14 @@ const EventDetail: React.FC = () => {
                 fontSize: 12,
                 fontWeight: '500',
               }}>
-                {moment(selectedEvent.startingTime.split(' ')[0]).format('MMM').toUpperCase()}
+                {moment(selectedEvent.startingTime, 'YYYY/MM/DD HH:mm A').format('MMM').toUpperCase()}
               </Text>
               <Text style={{
                 color: 'white',
                 fontSize: 18,
                 fontWeight: 'bold',
               }}>
-                {moment(selectedEvent.startingTime.split(' ')[0]).format('DD')}
+                {moment(selectedEvent.startingTime, 'YYYY/MM/DD HH:mm A').format('DD').toUpperCase()}
               </Text>
             </View>
           </View>
@@ -269,31 +277,30 @@ const EventDetail: React.FC = () => {
                   lineHeight: 24,
                   marginBottom: 24,
                 }}>
-                  {selectedEvent.description || 
-                   "Lorem ipsum dolor sit amet, consectetur elit adipiscing elit. Venenatis pulvinar a amet in, suspendisse vitae, posuere eu tortor et. Unc commodo, fermentum, mauris leo eget."}
+                  {selectedEvent.description ||
+                    "Lorem ipsum dolor sit amet, consectetur elit adipiscing elit. Venenatis pulvinar a amet in, suspendisse vitae, posuere eu tortor et. Unc commodo, fermentum, mauris leo eget."}
                 </Text>
 
                 {/* Location */}
                 <View style={{ marginBottom: 24 }}>
                   <Text style={{
-                    color: 'white',
+                    color: '#9CA3AF',
                     fontSize: 18,
                     fontWeight: 'bold',
-                    marginBottom: 16,
+                    marginBottom: 4,
                   }}>
                     LOCATION
                   </Text>
-                  
+
                   <View style={{
-                    backgroundColor: '#374151',
+
                     borderRadius: 12,
-                    height: 120,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+
+
                   }}>
                     <Text style={{
-                      color: '#9CA3AF',
-                      fontSize: 14,
+                      color: 'white',
+                      fontSize: 20,
                     }}>
                       {selectedEvent.location || 'Location Map'}
                     </Text>
@@ -309,7 +316,7 @@ const EventDetail: React.FC = () => {
                 }}>
                   <View>
                     <Text style={{
-                      color: 'white',
+                      color: '#9CA3AF',
                       fontSize: 18,
                       fontWeight: 'bold',
                       marginBottom: 4,
@@ -318,13 +325,40 @@ const EventDetail: React.FC = () => {
                     </Text>
                     <Text style={{
                       color: 'white',
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: 'bold',
                     }}>
-                      ${selectedEvent.price || '17.60'}/person
+                      RS. {selectedEvent.ticketprice || '17.60'}/person
                     </Text>
                   </View>
                 </View>
+
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 24,
+                }}>
+                  <View>
+                    <Text style={{
+                      color: '#9CA3AF',
+                      fontSize: 18,
+                      fontWeight: 'bold',
+                      marginBottom: 4,
+                    }}>
+                      Available tickets
+                    </Text>
+                    <Text style={{
+                      color: 'white',
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                    }}>
+                      {selectedEvent.ticketQuantity || 'Free'}
+                    </Text>
+                  </View>
+                </View>
+
+
               </View>
             ) : (
               <View>
@@ -334,42 +368,57 @@ const EventDetail: React.FC = () => {
                   textAlign: 'center',
                   marginTop: 40,
                 }}>
-                  Participants information will be shown here
+
+                  {selectedEvent.description}
                 </Text>
+
+                <Text style={{
+                  color: '#E5E7EB',
+                  fontSize: 16,
+                  textAlign: 'center',
+                  marginTop: 40,
+                }}>
+                  {selectedEvent.title}
+                  {selectedEvent.description}
+                </Text>
+
               </View>
+
             )}
           </View>
         </View>
+
+        {/* Bottom Buy Ticket Button */}
+        <View style={{
+          backgroundColor: '#1F2937',
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+          paddingBottom: 40,
+        }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: COLORS.purple,
+              borderRadius: 25,
+              paddingVertical: 16,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              marginRight: 8,
+            }}>
+              BUY  TICKETS
+            </Text>
+            <Ionicons name="ticket-outline" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
-      {/* Bottom Buy Ticket Button */}
-      <View style={{
-        backgroundColor: '#1F2937',
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-        paddingBottom: 40,
-      }}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#8B5CF6',
-            borderRadius: 25,
-            paddingVertical: 16,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{
-            color: 'white',
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginRight: 8,
-          }}>
-            BUY A TICKET
-          </Text>
-          <Ionicons name="ticket-outline" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
+
     </SafeAreaView>
   );
 };

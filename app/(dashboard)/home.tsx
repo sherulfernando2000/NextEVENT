@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,6 +11,7 @@ import {
   Animated,
   PanResponder,
   ScrollView,
+  Image,
 } from "react-native";
 import { McText, McAvatar, McIcon } from "@/constants/styled";
 import { COLORS, dummyData, images, SIZES } from "@/constants";
@@ -19,6 +20,10 @@ import moment from "moment";
 import { useNavigation } from '@react-navigation/native';
 import { Link } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient'; // Make sure to install this
+import { getEvents } from "@/services/eventService";
+import { useAuth } from "@/context/AuthContext";
+import { Events } from "@/constants/dummy";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = 200;
@@ -31,16 +36,24 @@ const EventScreen = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const featuredListRef = useRef(null);
   const navigation = useNavigation();
+  const {user} = useAuth();
 
-  const [events, setEvents] = useState([
-    { id: "1", name: "Music Festival", date: "Dec 28", location: "Central Park" },
-    { id: "2", name: "Tech Conference", date: "Jan 15", location: "Convention Center" },
-    { id: "3", name: "Art Exhibition", date: "Dec 30", location: "Modern Art Museum" },
-  ]);
+  const [events, setEvents] = useState([]);
 
-  const filteredEvents = events.filter(event =>
-    event.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchEvents = async () => {
+    const events = await getEvents();
+    console.log(events)
+    setEvents(events)
+  }
+
+  useEffect(() => {
+    fetchEvents()
+    console.log("user",user)
+  }, [])
+
+  // const filteredEvents = events.filter(event =>
+  //   event.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   // PanResponder for touch handling
   const panResponder = useRef(
@@ -59,7 +72,7 @@ const EventScreen = () => {
   ).current;
 
   const goToNextFeatured = () => {
-    if (currentFeaturedIndex < dummyData.Events.length - 1) {
+    if (currentFeaturedIndex < events.length - 1) {
       setCurrentFeaturedIndex(prev => prev + 1);
       featuredListRef.current?.scrollToIndex({
         index: currentFeaturedIndex + 1,
@@ -111,7 +124,7 @@ const EventScreen = () => {
             pathname: `/event/${item.id}`,
           }}>
           <ImageBackground
-            source={item.image}
+            source={{ uri: item.imageUrl }}
             className="rounded-2xl bg-cover relative"
             style={{
               width: '100%',
@@ -133,7 +146,7 @@ const EventScreen = () => {
 
             <View className="bg-black bg-opacity-40 p-3">
               <McText h4 className="text-white">{item.title}</McText>
-              <McText body6 className="text-gray-300">{item.startingTime}</McText>
+              <McText body6 className="text-gray-300">{moment(item.startingTime).format("YYYY-MM-DD HH:mm")}</McText>
             </View>
           </ImageBackground>
         </Link>
@@ -151,11 +164,28 @@ const EventScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header Section */}
         <View className="flex-row justify-between p-4">
-          <View>
-            <McText body5 className="text-gray-400">Dec 25 9:10am</McText>
-            <McText h1 className="text-white">Explore Events</McText>
+          <View className="mt-1">
+            {/* <McText body5 className="text-gray-400">{moment(new Date()).format("YYYY-MM-DD")}</McText> */}
+            <View className="flex-row">
+              <Image
+                              source={Events[0].image}
+                              style={{
+                                width:30,
+                                height: 30,
+                                marginRight:5
+                              }}
+                              resizeMode="cover"
+                            />
+              <Text className={`text-2xl text-white  font-bold`}>Next </Text>
+              <Text className={`text-2xl text-[#702963] font-bold`}>Events </Text>
+            </View>
+
           </View>
-          <McAvatar source={images.avatar} />
+          {
+            user?.photoURL? <McAvatar source={user?.photoURL? user?.photoURL : images.avatar  } /> : <Ionicons name={"person-circle-outline"} color={"white"} size={30} />
+          }
+          {/* <McAvatar source={user?.photoURL? user?.photoURL : images.avatar  } /> */}
+          {/* <Ionicons name={"person-circle-outline"} color={"white"} size={30} /> */}
         </View>
 
         {/* Search Bar Section */}
@@ -186,7 +216,7 @@ const EventScreen = () => {
             <McText h5 className="text-gray-400">FEATURED EVENTS</McText>
             <View className="flex-row">
               <Text className="text-gray-400 text-sm">
-                {currentFeaturedIndex + 1} / {dummyData.Events.length}
+                {currentFeaturedIndex + 1} / {events.length}
               </Text>
             </View>
           </View>
@@ -198,7 +228,7 @@ const EventScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 16 }}
               keyExtractor={(item) => 'featured_' + item.id}
-              data={dummyData.Events}
+              data={events}
               renderItem={_renderFeaturedItem}
               snapToInterval={ITEM_TOTAL_WIDTH}
               decelerationRate="fast"
@@ -219,7 +249,7 @@ const EventScreen = () => {
 
           {/* Navigation Dots */}
           <View className="flex-row justify-center mt-4">
-            {dummyData.Events.map((_, index) => (
+            {events.map((_, index) => (
               <View
                 key={index}
                 className={`w-2 h-2 rounded-full mx-1 ${index === currentFeaturedIndex ? 'bg-white' : 'bg-gray-600'
@@ -294,7 +324,7 @@ const EventScreen = () => {
           <View className="bg-gray-900 border border-gray-700 rounded-2xl p-6">
             <View className="items-center text-center">
               {/* Icon */}
-              <View className="bg-[#8B5CF6] bg-opacity-20 rounded-full w-16 h-16 items-center justify-center mb-4"
+              <View className="bg-[#702963] bg-opacity-20 rounded-full w-16 h-16 items-center justify-center mb-4"
 
               >
                 <McIcon source={icons.user} size={28} tintColor="#4096FE" />
@@ -311,15 +341,15 @@ const EventScreen = () => {
               {/* Features */}
               <View className="w-full mb-6">
                 <View className="flex-row items-center mb-2">
-                  <View className="w-2 h-2 bg-[#8B5CF6] rounded-full mr-3" />
+                  <View className="w-2 h-2 bg-[#702963] rounded-full mr-3" />
                   <McText body6 className="text-gray-300 flex-1">Easy event management tools</McText>
                 </View>
                 <View className="flex-row items-center mb-2">
-                  <View className="w-2 h-2 bg-[#8B5CF6] rounded-full mr-3" />
+                  <View className="w-2 h-2 bg-[#702963] rounded-full mr-3" />
                   <McText body6 className="text-gray-300 flex-1">Secure payment processing</McText>
                 </View>
                 <View className="flex-row items-center">
-                  <View className="w-2 h-2 bg-[#8B5CF6] rounded-full mr-3" />
+                  <View className="w-2 h-2 bg-[#702963] rounded-full mr-3" />
                   <McText body6 className="text-gray-300 flex-1">Marketing and promotion support</McText>
                 </View>
               </View>
@@ -330,7 +360,7 @@ const EventScreen = () => {
                 className="bg-blue-500 rounded-full px-8 py-4 w-full"
                 style={{ backgroundColor: COLORS.purple }}
               >
-                
+
                 <Text className="text-white font-semibold text-center text-base">
                   Register as Event Organizer
                 </Text>

@@ -1,7 +1,8 @@
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView } from "react-native"
-import React, { useState, useEffect } from "react"
+import { COLORS } from "@/constants"
 import { Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "expo-router"
+import React, { useEffect, useState } from "react"
+import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native"
 
 // Dummy data (replace with API call)
 const dummyEventPurchases = [
@@ -39,7 +40,7 @@ const PurchasesByEventScreen = () => {
   }, [])
 
   const renderEvent = ({ item }: any) => (
-    <View className="bg-gray-900 p-4 rounded-2xl mb-4">
+    <View className="bg-gray-900 p-2 rounded-2xl mb-4">
       {/* Event Header */}
       <View className="flex-row justify-between items-center mb-2">
         <Text className="text-white text-xl font-bold">{item.title}</Text>
@@ -47,12 +48,13 @@ const PurchasesByEventScreen = () => {
       </View>
 
       {/* Stats */}
-      <View className="flex-row justify-between mb-4">
-        <Text className="text-green-400">
-          Tickets Sold:{item?.ticketsSold ?? 0}
+      <View className="flex-row items-center justify-center mb-4">
+        
+        <Text className="w-1/2 pl-2 text-green-400">
+          Tickets Sold: {item?.ticketsSold ?? 0}
         </Text>
       
-        <Text className="text-purple-400">Revenue: ${item.totalRevenue}</Text>
+        <Text className="w-1/2 pl-10 text-purple-400">Revenue: ${item.totalRevenue}</Text>
       </View>
 
       {/* Buyers */}
@@ -63,8 +65,8 @@ const PurchasesByEventScreen = () => {
             key={buyer.id}
             className="flex-row justify-between border-b border-gray-700 py-1"
           >
-            <Text className="text-gray-300">{buyer.name}</Text>
-            <Text className="text-gray-400">Qty: {buyer.qty}</Text>
+            <Text className="w-1/2   text-gray-300">{buyer.name}</Text>
+            <Text className="w-1/2 pl-28 text-gray-400">Qty: {buyer.qty}</Text>
           </View>
         ))}
       </View>

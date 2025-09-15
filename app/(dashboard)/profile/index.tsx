@@ -24,7 +24,7 @@ const ProfileScreen = () => {
           className=" p-4 rounded-2xl flex-row gap-2"
           onPress={() => router.push("/(dashboard)/profile/saved-events")}
         >
-          <Ionicons name="save-outline" size={24} color="white" />
+          <Ionicons name="heart-outline" size={24} color="white" />
           <Text className="text-white text-lg"> Saved Events</Text>
         </TouchableOpacity>
 
