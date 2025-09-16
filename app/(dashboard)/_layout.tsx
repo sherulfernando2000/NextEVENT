@@ -22,7 +22,7 @@ const DashboardLayout = () => {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: COLORS.transparentBlack,
-          position: "absolute", // so border radius can show
+          position: "absolute", 
           left: 0,
           right: 0,
           bottom: 0,
@@ -30,8 +30,8 @@ const DashboardLayout = () => {
           borderTopRightRadius: 24,
           height: 60,
           paddingTop: 5,
-          borderTopWidth: 0, // remove default border
-          overflow: "hidden", // ensure children respect radius
+          borderTopWidth: 0, 
+          overflow: "hidden", 
 
         }
       }}
@@ -53,6 +53,6 @@ const DashboardLayout = () => {
   )
 }
 
-// tasks/index
+
 
 export default DashboardLayout

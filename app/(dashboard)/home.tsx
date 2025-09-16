@@ -19,11 +19,12 @@ import { icons } from "@/constants";
 import moment from "moment";
 import { useNavigation } from '@react-navigation/native';
 import { Link } from "expo-router";
-import { LinearGradient } from 'expo-linear-gradient'; // Make sure to install this
+import { LinearGradient } from 'expo-linear-gradient';
 import { getEvents } from "@/services/eventService";
 import { useAuth } from "@/context/AuthContext";
 import { Events } from "@/constants/dummy";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons"
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = 200;
@@ -36,7 +37,7 @@ const EventScreen = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const featuredListRef = useRef(null);
   const navigation = useNavigation();
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   const [events, setEvents] = useState([]);
 
@@ -48,12 +49,10 @@ const EventScreen = () => {
 
   useEffect(() => {
     fetchEvents()
-    console.log("user",user)
+    console.log("user", user)
   }, [])
 
-  // const filteredEvents = events.filter(event =>
-  //   event.name.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
+
 
   // PanResponder for touch handling
   const panResponder = useRef(
@@ -156,7 +155,7 @@ const EventScreen = () => {
 
   const handleRegisterAsSeller = () => {
     // Navigate to seller registration
-    navigation.navigate('SellerRegistration'); // Update with your actual route name
+    navigation.navigate('SellerRegistration');
   };
 
   return (
@@ -165,26 +164,25 @@ const EventScreen = () => {
         {/* Header Section */}
         <View className="flex-row justify-between p-4">
           <View className="mt-1">
-            {/* <McText body5 className="text-gray-400">{moment(new Date()).format("YYYY-MM-DD")}</McText> */}
             <View className="flex-row">
               <Image
-                              source={Events[0].image}
-                              style={{
-                                width:30,
-                                height: 30,
-                                marginRight:5
-                              }}
-                              resizeMode="cover"
-                            />
+                source={Events[0].image}
+                style={{
+                  width: 30,
+                  height: 30,
+                  marginRight: 5
+                }}
+                resizeMode="cover"
+              />
               <Text className={`text-2xl text-white  font-bold`}>Next </Text>
               <Text className={`text-2xl text-[#702963] font-bold`}>Events </Text>
             </View>
 
           </View>
-          {
+          {/* {
             user?.photoURL? <McAvatar source={user?.photoURL? user?.photoURL : images.avatar  } /> : <Ionicons name={"person-circle-outline"} color={"white"} size={30} />
-          }
-          {/* <McAvatar source={user?.photoURL? user?.photoURL : images.avatar  } /> */}
+          } */}
+          <McAvatar source={require('../../assets/images/avatar_sherul.png')} />
           {/* <Ionicons name={"person-circle-outline"} color={"white"} size={30} /> */}
         </View>
 
@@ -327,7 +325,7 @@ const EventScreen = () => {
               <View className="bg-[#702963] bg-opacity-20 rounded-full w-16 h-16 items-center justify-center mb-4"
 
               >
-                <McIcon source={icons.user} size={28} tintColor="#4096FE" />
+                <FontAwesome name="user-circle-o" size={40} color="white" />
               </View>
 
               {/* Content */}

@@ -41,12 +41,9 @@ const Events: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Categories for filtering
-  const categories = ['All','Tech', 'Comedy', 'Drama', 'Cinema', 'Standup Comedy', 'Music', 'Sports'];
+  const categories = ['All', 'Tech', 'Comedy', 'Drama', 'Cinema', 'Standup Comedy', 'Music', 'Sports'];
   const router = useRouter();
-  // useEffect(() => {
-  //   setEvents(dummyData.Events);
-  //   setFilteredEvents(dummyData.Events);
-  // }, []);
+
 
   const fetchEvents = async () => {
     const events = await getEvents();
@@ -54,7 +51,7 @@ const Events: React.FC = () => {
     setEvents(events)
   }
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchEvents()
   })
 
@@ -89,7 +86,7 @@ const Events: React.FC = () => {
 
   const handleEventPress = (id: string) => {
     console.log('id.............', id)
-     router.push(`/event/${id}`);
+    router.push(`/event/${id}`);
   };
 
   const renderCategoryItem = ({ item }: { item: string }) => (
@@ -222,7 +219,7 @@ const Events: React.FC = () => {
               marginLeft: 6,
             }}
           >
-           {moment(item.startingTime).format("YYYY-MM-DD HH:mm")}
+            {moment(item.startingTime).format("YYYY-MM-DD HH:mm")}
           </Text>
         </View>
 
@@ -264,7 +261,7 @@ const Events: React.FC = () => {
             color: 'white',
             fontSize: 20,
             fontWeight: 'bold',
-           
+
           }}
         >
           EVENTS
