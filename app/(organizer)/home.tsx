@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { getEventsByUser } from '@/services/eventService';
 import { useAuth } from '@/context/AuthContext';
 
-// Define the Event type based on your data structure
+
 interface Event {
   id: string;
   title: string;
@@ -37,7 +37,7 @@ const OrganizerHome = () => {
       setEvents([]);
     } finally {
       setLoading(false);
-      //fdsa
+      
     }
   };
 
