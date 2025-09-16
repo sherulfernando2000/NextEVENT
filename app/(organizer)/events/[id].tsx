@@ -254,7 +254,7 @@ const EventDetailScreen = () => {
         <TouchableOpacity
           onPress={handleUpdate}
           disabled={loading}
-          className={`${loading ? 'bg-purple-400' : 'bg-purple-600'} py-4 mb-4 rounded-xl items-center`}
+          className={`${loading ? 'bg-purple-400' : 'bg-purple-600'} py-4 mb-16 rounded-xl items-center`}
         >
           <Text className="text-white font-bold text-lg">
             {loading ? "Processing....." : "Update Event"}
