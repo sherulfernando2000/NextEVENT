@@ -11,11 +11,7 @@ const tabs = [
 
 export default function OrganizerLayout() {
   return (
-    // <Tabs>
-    //   <Tabs.Screen name="home" options={{ title: "Dashboard" }} />
-    //   <Tabs.Screen name="events" options={{ title: "My Events" }} />
-    //   <Tabs.Screen name="tickets" options={{ title: "Tickets" }} />
-    // </Tabs>
+    
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.purple,
@@ -23,7 +19,7 @@ export default function OrganizerLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: COLORS.transparentBlack,
-          position: "absolute", // so border radius can show
+          position: "absolute", 
           left: 0,
           right: 0,
           bottom: 0,
@@ -31,13 +27,13 @@ export default function OrganizerLayout() {
           borderTopRightRadius: 24,
           height: 60,
           paddingTop: 5,
-          borderTopWidth: 0, // remove default border
-          overflow: "hidden", // ensure children respect radius
+          borderTopWidth: 0,
+          overflow: "hidden", 
 
         }
       }}
     >
-      {/* (obj.name) ===  ({name}) */}
+      
       {tabs.map(({ name, icon, label }) => (
         <Tabs.Screen
           key={name}
