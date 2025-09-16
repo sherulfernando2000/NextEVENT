@@ -144,7 +144,7 @@ const AddEventScreen = () => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          padding: 16,
+          padding: 5,
         }}
       >
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -330,7 +330,7 @@ const AddEventScreen = () => {
 
           }}
 
-          className={` p-4 rounded-2xl mb-10`}
+          className={` p-4 rounded-2xl mb-20`}
         >
           {
             loading ? (
