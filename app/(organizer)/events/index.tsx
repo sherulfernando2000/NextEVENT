@@ -9,21 +9,11 @@ import { Event } from "@/types/types";
 import moment from "moment";
 import { Alert, ActivityIndicator } from "react-native";
 
-// interface Event {
-//   id: string;
-//   title: string;
-//   date: string;
-//   location: string;
-// }
-
 const EventIndex = () => {
   const router = useRouter();
   const { user } = useAuth()
   const navigation = useNavigation()
-  // const [events, setEvents] = useState<Event[]>([
-  //   { id: "1", title: "Music Fest", date: "2025-09-20", location: "Colombo" },
-  //   { id: "2", title: "Tech Meetup", date: "2025-10-01", location: "Kandy" },
-  // ]);
+
 
   const [events, setEvents] = useState<Event[]>()
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -128,7 +118,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    padding: 5,
+    padding: 20,
+  
   },
   header: {
     fontSize: 20,
@@ -162,7 +153,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: "absolute",
-    bottom: 24,
+    bottom: 60,
     right: 24,
     backgroundColor: COLORS.purple,
     width: 56,
