@@ -1,4 +1,6 @@
 # Welcome to Next Event app 👋
+ Youtube vedio demo - https://youtu.be/t20NrsqU33E?si=R6nzXkLtocs5NjED   
+ Download apk - https://drive.google.com/drive/folders/1jjraqD48KC-V0uhqyFQirysARR5zr9lV?usp=sharing   
 
 ## 🚀 Features
 
