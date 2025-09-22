@@ -1,6 +1,25 @@
-# Welcome to your Next Event app 👋
+# Welcome to Next Event app 👋
+
+## 🚀 Features
+
+### 👤 User Features
+- 📅 Browse and explore upcoming events  
+- 🎭 Filter & select events by category (Music, Comedy, Sports, Drama, etc.)  
+- 🎟️ Buy tickets securely online  
+- 🧾 View ticket purchase history  
+- 📲 Store e-tickets in the app for quick access  
+
+### 👨‍💼 Organizer/Admin Features
+- ✍️ Post and manage event details (title, date, location, capacity, etc.)  
+- 📊 Track ticket sales and attendees in real-time  
+- 🗑️ Edit or delete existing events instantly  
+- 🔍 Built-in **QR Scanner** to validate and release online tickets  
+
+---
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+
+---
 
 ## Get started
 
