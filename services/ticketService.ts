@@ -1,5 +1,5 @@
 import { auth, db } from '@/firebase';
-import { TicketPurchase } from '@/types/types';
+import { Event, TicketPurchase } from '@/types/types';
 import {
   collection,
   addDoc,
@@ -18,8 +18,10 @@ import {
   updateDoc, // Added for updating documents
   deleteDoc, // Added for deleting documents
   DocumentData, // Added for updateDoc type hinting
+  documentId,
   where
 } from 'firebase/firestore';
+import { eventCollectionRef } from './eventService';
 
 // --- NEW TICKET PURCHASE RELATED CODE ---
 
@@ -30,6 +32,7 @@ interface TicketPurchaseDbModel {
   bookingId: string;
   purchaseDate: Timestamp;
   quantity: number;
+  event?: Event;  
 }
 
 // Function to generate a simple unique booking ID (for demonstration)
@@ -120,22 +123,84 @@ export async function getTicketPurchaseById(id: string): Promise<TicketPurchase 
 /**
  * Retrieves all ticket purchases made by a specific user.
  */
+// export async function getTicketPurchasesByUser(userId: string): Promise<TicketPurchase[]> {
+//   try {
+//     const q = query(
+//       ticketPurchaseCollectionRef,
+//       where("userId", "==", userId),
+//       orderBy("purchaseDate", "desc") // Order by most recent purchases
+//     );
+//     const querySnapshot = await getDocs(q);
+//     const purchases: TicketPurchase[] = [];
+//     querySnapshot.forEach((doc) => { purchases.push(doc.data()); });
+//     return purchases;
+//   } catch (e) {
+//     console.error(`Error getting ticket purchases for user ${userId}: `, e);
+//     throw e;
+//   }
+// }
+
 export async function getTicketPurchasesByUser(userId: string): Promise<TicketPurchase[]> {
   try {
-    const q = query(
+    // 1. Fetch the TicketPurchase documents
+    const purchasesQuery = query(
       ticketPurchaseCollectionRef,
       where("userId", "==", userId),
-      orderBy("purchaseDate", "desc") // Order by most recent purchases
+      orderBy("purchaseDate", "desc")
     );
-    const querySnapshot = await getDocs(q);
+    const purchaseSnapshot = await getDocs(purchasesQuery);
+
     const purchases: TicketPurchase[] = [];
-    querySnapshot.forEach((doc) => { purchases.push(doc.data()); });
-    return purchases;
+    const eventIds: Set<string> = new Set(); // To store unique event IDs
+
+    purchaseSnapshot.forEach((purchaseDoc) => {
+      const purchase = purchaseDoc.data();
+      purchases.push(purchase);
+      eventIds.add(purchase.eventId); // Collect event IDs
+    });
+
+    // If no purchases or no event IDs, return early
+    if (eventIds.size === 0) {
+      return purchases;
+    }
+
+    // 2. Fetch the corresponding Event documents
+    const uniqueEventIds = Array.from(eventIds);
+    const eventsMap = new Map<string, Event>();
+
+    // Firestore 'in' query has a limit of 10 values.
+    // If you expect more than 10 unique event IDs, you'll need to batch these queries.
+    // For simplicity, assuming less than or equal to 10 unique event IDs here.
+    // If you have more, you'd loop and query in chunks of 10.
+    if (uniqueEventIds.length > 0) {
+        const eventsQuery = query(
+            eventCollectionRef,
+            where(documentId(), 'in', uniqueEventIds)
+        );
+        const eventSnapshot = await getDocs(eventsQuery);
+        eventSnapshot.forEach((eventDoc) => {
+            const event = eventDoc.data();
+            eventsMap.set(event.id, event);
+        });
+    }
+
+
+    // 3. Combine purchases with their respective event data
+    const purchasesWithEvents = purchases.map((purchase) => {
+      return {
+        ...purchase,
+        event: eventsMap.get(purchase.eventId), // Attach the event object
+      };
+    });
+
+    return purchasesWithEvents;
   } catch (e) {
     console.error(`Error getting ticket purchases for user ${userId}: `, e);
     throw e;
   }
 }
+
+
 
 /**
  * Retrieves all ticket purchases for a specific event.
@@ -157,6 +222,42 @@ export async function getTicketPurchasesByEvent(eventId: string): Promise<Ticket
   }
 }
 
+
+export async function getTicketPurchasesByEvents(eventIds: string[]): Promise<TicketPurchase[]> {
+  if (eventIds.length === 0) {
+    return []; // Return empty array if no event IDs are provided
+  }
+
+  try {
+    const allPurchases: TicketPurchase[] = [];
+    const BATCH_SIZE = 10; // Firestore 'in' query limit
+
+    // Process eventIds in batches of 10
+    for (let i = 0; i < eventIds.length; i += BATCH_SIZE) {
+      const batchEventIds = eventIds.slice(i, i + BATCH_SIZE);
+
+      const q = query(
+        ticketPurchaseCollectionRef,
+        where("eventId", "in", batchEventIds), // Use 'in' operator for multiple eventIds
+        orderBy("purchaseDate", "asc")         // Order by purchase date
+      );
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        allPurchases.push(doc.data());
+      });
+    }
+
+    // You might want to deduplicate here if an eventId could appear in multiple batches
+    // (though 'in' queries generally handle this if the initial eventIds array is unique)
+    // A Set could be used if strict uniqueness is required after combining results from batches.
+
+    return allPurchases;
+  } catch (e) {
+    console.error(`Error getting ticket purchases for multiple events: `, e);
+    throw e;
+  }
+}
 
 // Helper for updateTicketPurchase (assuming some fields might be updated, though less common for purchases)
 function prepareUpdateTicketPurchaseData(
