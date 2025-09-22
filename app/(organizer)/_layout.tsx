@@ -6,6 +6,7 @@ const tabs = [
   { label: "Home", name: "home", icon: "home-outline" },
   { label: "Events", name: "events", icon: "list-outline" },
   { label: "Ticket", name: "tickets", icon: "ticket-outline" },
+  { label: "QR", name: "qrscanner", icon: "qr-code-outline" },
 
 ] as const
 
